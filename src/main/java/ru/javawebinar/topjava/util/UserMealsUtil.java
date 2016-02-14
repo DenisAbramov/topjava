@@ -7,6 +7,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,13 +24,25 @@ public class UserMealsUtil {
                 new UserMeal(LocalDateTime.of(2015, Month.MAY, 31,13,0), "Обед", 500),
                 new UserMeal(LocalDateTime.of(2015, Month.MAY, 31,20,0), "Ужин", 510)
         );
-        getFilteredMealsWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12,0), 2000);
+
+        List<UserMealWithExceed> list =  getFilteredMealsWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12,0), 2000);
+
+        System.out.println(list);
 //        .toLocalDate();
 //        .toLocalTime();
     }
 
     public static List<UserMealWithExceed>  getFilteredMealsWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        // TODO return filtered list with correctly exceeded field
-        return null;
+        List<UserMealWithExceed> list = new LinkedList<>();
+        for(UserMeal user: mealList )
+        {
+         if(user.getDateTime().toLocalTime().isBefore(endTime) && user.getDateTime().toLocalTime().isAfter(startTime))
+         {
+             list.add(new UserMealWithExceed(user.getDateTime(), user.getDescription(), user.getCalories(), user.getCalories() > caloriesPerDay));
+         }
+
+        }
+        return list;
     }
+
 }
