@@ -34,14 +34,23 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExceed>  getFilteredMealsWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         List<UserMealWithExceed> list = new LinkedList<>();
-        for(UserMeal user: mealList )
+        for(UserMeal user: mealList)
         {
-         if(user.getDateTime().toLocalTime().isBefore(endTime) && user.getDateTime().toLocalTime().isAfter(startTime))
-         {
-             list.add(new UserMealWithExceed(user.getDateTime(), user.getDescription(), user.getCalories(), user.getCalories() > caloriesPerDay));
-         }
+            if(user.getDateTime().toLocalTime().isBefore(endTime) && user.getDateTime().toLocalTime().isAfter(startTime))
+            {
+                int count = 0;
+                for(int i =0; i < mealList.size(); i++)
+                {
+                    if(user.getDateTime().getDayOfMonth() == (mealList.get(i).getDateTime().getDayOfMonth())) //если число месяца равно - то суммируем все калории за это число
+                    {
+                        count = count + mealList.get(i).getCalories();
+                    }
+                }
+                list.add(new UserMealWithExceed(user.getDateTime(), user.getDescription(), user.getCalories(), count > caloriesPerDay));
+            }
 
         }
+
         return list;
     }
 
