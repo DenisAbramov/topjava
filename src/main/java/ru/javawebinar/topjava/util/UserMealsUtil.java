@@ -6,9 +6,7 @@ import ru.javawebinar.topjava.model.UserMealWithExceed;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.Month;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * GKislin
@@ -25,14 +23,43 @@ public class UserMealsUtil {
                 new UserMeal(LocalDateTime.of(2015, Month.MAY, 31,20,0), "Ужин", 510)
         );
 
-        List<UserMealWithExceed> list =  getFilteredMealsWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12,0), 2000);
+      getFilteredMealsWithExceeded(mealList, LocalTime.of(7, 0), LocalTime.of(12,0), 2000);
 
-        System.out.println(list);
 //        .toLocalDate();
 //        .toLocalTime();
     }
 
     public static List<UserMealWithExceed>  getFilteredMealsWithExceeded(List<UserMeal> mealList, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+
+        //Так, вроде, быстрее.
+        Map<Integer, Integer> map = new HashMap<>();
+
+        for(UserMeal user: mealList)
+        {
+            int dayOfMonth = user.getDateTime().getDayOfMonth();
+            if(map.containsKey(dayOfMonth))
+            {
+                map.put(dayOfMonth, map.get(dayOfMonth) + user.getCalories());
+            }
+            else
+                map.put(dayOfMonth, user.getCalories());
+        }
+
+
+        List<UserMealWithExceed> list = new LinkedList<>();
+        for(UserMeal user: mealList)
+        {
+            if(user.getDateTime().toLocalTime().isBefore(endTime) && user.getDateTime().toLocalTime().isAfter(startTime))
+            {
+                list.add(new UserMealWithExceed(user.getDateTime(), user.getDescription(), user.getCalories(), map.get(user.getDateTime().getDayOfMonth()) > caloriesPerDay));
+            }
+
+        }
+
+        return list;
+
+
+        /*
         List<UserMealWithExceed> list = new LinkedList<>();
         for(UserMeal user: mealList)
         {
@@ -41,7 +68,7 @@ public class UserMealsUtil {
                 int count = 0;
                 for(int i =0; i < mealList.size(); i++)
                 {
-                    if(user.getDateTime().getDayOfMonth() == (mealList.get(i).getDateTime().getDayOfMonth())) //если число месяца равно - то суммируем все калории за это число
+                    if(user.getDateTime().getDayOfMonth() == (mealList.get(i).getDateTime().getDayOfMonth()))
                     {
                         count = count + mealList.get(i).getCalories();
                     }
@@ -51,7 +78,7 @@ public class UserMealsUtil {
 
         }
 
-        return list;
+        return list;*/
     }
 
 }
